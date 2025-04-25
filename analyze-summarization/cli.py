@@ -5,6 +5,8 @@ import argparse
 import sys
 from typing import List
 
+from commands.distill import distill_model
+
 # Command names
 DISTILL_COMMAND = "distill"
 ANALYZE_COMMAND = "analyze"
@@ -13,8 +15,8 @@ REPORT_COMMAND = "report"
 # Text and summary dataset
 DATASET_NAME = "ccdv/govreport-summarization"
 
-# Default model name
-DEFAULT_MODEL_NAME = "BGE-M3"
+# Default model
+DEFAULT_MODEL_IDENTIFIER = "BAAI/bge-m3"
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -34,8 +36,8 @@ def create_parser() -> argparse.ArgumentParser:
         "--model",
         "-m",
         type=str,
-        help=f"Model to distill. Defaults to {DEFAULT_MODEL_NAME}.",
-        default=DEFAULT_MODEL_NAME,
+        help=f"Model to distill. Defaults to {DEFAULT_MODEL_IDENTIFIER}.",
+        default=DEFAULT_MODEL_IDENTIFIER,
     )
     distill_parser.add_argument(
         "--output-path",
@@ -50,25 +52,13 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def distill_model(model_name: str, output_path: str) -> None:
-    """Distill the model using Model2Vec."""
-
-    print(f"Distilling model {model_name} to {output_path}...")
-
-    print("Distillation complete.")
-
-    print(f"Model saved to {output_path}.")
-
-
 def main(argv: List[str] = sys.argv) -> int:
     """Handle command line arguments and execute the appropriate command."""
     parser = create_parser()
     args = parser.parse_args(argv[1:])
 
     if args.command == DISTILL_COMMAND:
-        model_name = args.model
-        output_path = args.output_path if args.output_path else model_name
-        distill_model(model_name, output_path)
+        distill_model(args.model, args.output_path)
         return 0
     # TODO: handle help command
     else:
