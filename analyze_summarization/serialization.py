@@ -7,6 +7,8 @@ import pandas as pd
 
 @dataclass
 class AnalysisMetadata:
+    """Metadata for the distance analysis."""
+
     date: str
     model: str
     dataset: str
@@ -21,21 +23,19 @@ def save_analysis(
     metadata: AnalysisMetadata,
     output: str,
 ) -> None:
-    """Serialize the similarities to a CSV file."""
+    """Serialize the similarities calculated by the distance analysis to a CSV file."""
 
     metadata_df = pd.DataFrame(metadata.__dict__, index=["metadata"])
     similarities_df = pd.DataFrame({"similarity": similarities})
     combined_df = pd.concat([metadata_df, similarities_df], axis=1)
-    combined_df.to_csv(
-        output, index=False
-    )  # set index=False to avoid saving DataFrame index
+    combined_df.to_csv(output, index=False)
 
 
 # TODO: Avoid turning the similarities into a list of floats, as they may be
 # turned into a dataframe later. And do this while satisfying the type checker.
 # Perhaps combine similarities dataframe and metadata into a single dataclass
 def load_analysis(input: str) -> Tuple[List[float], AnalysisMetadata]:
-    """Load the analysis from a CSV file."""
+    """Load a serialized analysis from a CSV file."""
     df = pd.read_csv(input)
     metadata = AnalysisMetadata(
         **df.iloc[0][0:-1].to_dict()
@@ -46,6 +46,9 @@ def load_analysis(input: str) -> Tuple[List[float], AnalysisMetadata]:
 
 @dataclass
 class Report:
+    """Report containing summary statistics, a distance distribution and metadata
+    for analysis results."""
+
     similarity_count: int
     average_similarity: float
     min_similarity: float

@@ -15,8 +15,38 @@ ANALYZE_COMMAND = "analyze"
 REPORT_COMMAND = "report"
 
 
-# Default model
+# Defaults
 DEFAULT_MODEL_IDENTIFIER = "BAAI/bge-m3"
+DEFAULT_PCA_DIMS = 256  # Number of PCA dimensions for distillation
+DEFAULT_DATA_SPLIT = "validation"  # Default dataset split for analysis
+DEFAULT_SPLIT_INTO_SENTENCES = False  # Whether to split the text into sentences
+
+
+def main(argv: List[str] = sys.argv) -> int:
+    """Handle command line arguments and execute the appropriate command."""
+    # TODO: defensive input validation
+    parser = create_parser()
+    args = parser.parse_args(argv[1:])
+
+    if args.command == DISTILL_COMMAND:
+        distill_model(args.model, args.output_path, args.pca_dims)
+        return 0
+    elif args.command == ANALYZE_COMMAND:
+        analyze_dataset(
+            args.model,
+            args.output_path,
+            args.split,
+            args.split_into_sentences,
+            args.skip,
+            args.take,
+        )
+        return 0
+    elif args.command == REPORT_COMMAND:
+        generate_report(args.input_path, args.output_path)
+        return 0
+    else:
+        parser.print_help()
+        return 1
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -46,6 +76,14 @@ def create_parser() -> argparse.ArgumentParser:
         help="Output path for the distilled model. Defaults to the model name.",
         default=None,
     )
+    distill_parser.add_argument(
+        "--pca-dims",
+        "-d",
+        type=int,
+        help="Number of PCA dimensions for distillation. Defaults to "
+        f"{DEFAULT_PCA_DIMS}.",
+        default=DEFAULT_PCA_DIMS,
+    )
 
     # Analyze command
     analyze_parser = subparsers.add_parser(
@@ -72,8 +110,16 @@ def create_parser() -> argparse.ArgumentParser:
         "--split",
         "-s",
         type=str,
-        help="Dataset split to analyze. Use 'train', 'validation', or 'test'. Defaults to 'validation'.",
-        default="validation",
+        help="Dataset split to analyze. Use 'train', 'validation', or 'test'. "
+        f"Defaults to '{DEFAULT_DATA_SPLIT}'.",
+        default=DEFAULT_DATA_SPLIT,
+    )
+    analyze_parser.add_argument(
+        "--split-into-sentences",
+        action="store_true",
+        help="Whether to split the text into sentences before analysis. "
+        f"Defaults to '{DEFAULT_SPLIT_INTO_SENTENCES}'.",
+        default=DEFAULT_SPLIT_INTO_SENTENCES,
     )
     analyze_parser.add_argument(
         "--skip",
@@ -109,31 +155,6 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     return parser
-
-
-def main(argv: List[str] = sys.argv) -> int:
-    """Handle command line arguments and execute the appropriate command."""
-    parser = create_parser()
-    args = parser.parse_args(argv[1:])
-
-    if args.command == DISTILL_COMMAND:
-        distill_model(args.model, args.output_path)
-        return 0
-    elif args.command == ANALYZE_COMMAND:
-        analyze_dataset(
-            args.model,
-            args.output_path,
-            args.split,
-            args.skip,
-            args.take,
-        )
-        return 0
-    elif args.command == REPORT_COMMAND:
-        generate_report(args.input_path, args.output_path)
-        return 0
-    else:
-        parser.print_help()
-        return 1
 
 
 if __name__ == "__main__":
