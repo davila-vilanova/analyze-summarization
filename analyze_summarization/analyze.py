@@ -16,7 +16,6 @@ def analyze_dataset(
     model_path: str,
     output: str,
     split: str,
-    split_into_sentences: bool,
     skip: Optional[int] = None,
     take: Optional[int] = None,
 ) -> None:
@@ -28,7 +27,6 @@ def analyze_dataset(
         model_path (str): Path to the distilled model.
         output (str): Output path for the analysis results.
         split (str): Dataset split to analyze.
-        split_into_sentences (bool): Whether to split the text into sentences before analysis.
         skip (Optional[int]): Number of samples to skip in the dataset.
         take (Optional[int]): Number of samples to take from the dataset.
     """
@@ -46,7 +44,7 @@ def analyze_dataset(
     for sample in subset:
         text1 = sample[REPORT_KEY]
         text2 = sample[SUMMARY_KEY]
-        similarity = _text_similarity(text1, text2, model, split_into_sentences)
+        similarity = _text_similarity(text1, text2, model)
         similarities.append(similarity)
 
     print(f"Outputting results to {output}...")
@@ -60,7 +58,6 @@ def analyze_dataset(
             split=split,
             skip=skip,
             take=take,
-            split_into_sentences=split_into_sentences,
         ),
         output=output,
     )
@@ -68,19 +65,6 @@ def analyze_dataset(
     print(
         f"Analysis complete. Calculated {len(similarities)} similarities. Results saved to {output}."
     )
-
-
-# encode() takes a list of sentences to encode. Open question: how do the results
-# vary when passing the whole text vs. splitting it into sentences? Which is a
-# more precise indicator of similarity?
-def _split_into_sentences(text: str) -> list[str]:
-    """Split text into sentences by looking for periods followed by a space. The
-    returned sentences will have the period at the end."""
-    # quick and dirty, perhaps naive sentence splitting
-    sentences = text.split(". ")
-    # Restore the period at the end of each sentence
-    sentences = [s + "." for s in sentences]
-    return sentences
 
 
 def _cosine_similarity(vec1, vec2) -> float:
@@ -104,20 +88,16 @@ def _text_similarity(
     text1: str,
     text2: str,
     model: StaticModel,
-    split_into_sentences: bool,
 ) -> float:
     """Calculate the similarity between two texts using the provided model.
     Args:
         text1 (str): First text to compare.
         text2 (str): Second text to compare.
         model (StaticModel): Model to use to calculate the embeddings.
-        split_into_sentences (bool): Whether to split the text into sentences before analysis.
     """
-    preprocessed_text1 = _split_into_sentences(text1) if split_into_sentences else text1
-    preprocessed_text2 = _split_into_sentences(text2) if split_into_sentences else text2
 
     vec1, vec2 = model.encode(
-        [preprocessed_text1, preprocessed_text2],
+        [text1, text2],
         show_progress_bar=False,
         max_length=None,  # reports can be quite long
     )

@@ -19,7 +19,6 @@ REPORT_COMMAND = "report"
 DEFAULT_MODEL_IDENTIFIER = "BAAI/bge-m3"
 DEFAULT_PCA_DIMS = 256  # Number of PCA dimensions for distillation
 DEFAULT_DATA_SPLIT = "validation"  # Default dataset split for analysis
-DEFAULT_SPLIT_INTO_SENTENCES = False  # Whether to split the text into sentences
 
 
 def main(argv: List[str] = sys.argv) -> int:
@@ -36,7 +35,6 @@ def main(argv: List[str] = sys.argv) -> int:
             args.model,
             args.output_path,
             args.split,
-            args.split_into_sentences,
             args.skip,
             args.take,
         )
@@ -113,13 +111,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Dataset split to analyze. Use 'train', 'validation', or 'test'. "
         f"Defaults to '{DEFAULT_DATA_SPLIT}'.",
         default=DEFAULT_DATA_SPLIT,
-    )
-    analyze_parser.add_argument(
-        "--split-into-sentences",
-        action="store_true",
-        help="Whether to split the text into sentences before analysis. "
-        f"Defaults to '{DEFAULT_SPLIT_INTO_SENTENCES}'.",
-        default=DEFAULT_SPLIT_INTO_SENTENCES,
     )
     analyze_parser.add_argument(
         "--skip",

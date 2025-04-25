@@ -15,7 +15,6 @@ class AnalysisMetadata:
     split: str
     skip: Optional[int]
     take: Optional[int]
-    split_into_sentences: bool
 
 
 def save_analysis(
