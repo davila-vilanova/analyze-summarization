@@ -7,14 +7,13 @@ from typing import List
 
 from commands.analyze import analyze_dataset
 from commands.distill import distill_model
+from commands.analyze import DATASET_NAME
 
 # Command names
 DISTILL_COMMAND = "distill"
 ANALYZE_COMMAND = "analyze"
 REPORT_COMMAND = "report"
 
-# Text and summary dataset
-DATASET_NAME = "ccdv/govreport-summarization"
 
 # Default model
 DEFAULT_MODEL_IDENTIFIER = "BAAI/bge-m3"
