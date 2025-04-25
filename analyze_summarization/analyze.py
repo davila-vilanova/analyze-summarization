@@ -1,8 +1,9 @@
 from typing import Optional
+
 import numpy as np
-import pandas as pd
 from datasets import load_dataset
 from model2vec import StaticModel
+from serialization import AnalysisMetadata, save_analysis
 
 DATASET_NAME = "ccdv/govreport-summarization"
 
@@ -84,20 +85,20 @@ def analyze_dataset(
 
     print(f"Outputting results to {output}...")
     # save similarities to CSV along with metadata
-    metadata = {
-        "date": np.datetime_as_string(np.datetime64("now"), unit="s"),
-        "model": model_path,
-        "dataset": DATASET_NAME,
-        "split": split,
-        "skip": skip,
-        "take": take,
-        "split_into_sentences": SPLIT_INTO_SENTENCES,
-    }
 
-    df = pd.DataFrame({"similarity": similarities})
-    metadata_df = pd.DataFrame(metadata, index=["metadata"])
-    df = pd.concat([metadata_df, df])
-    df.to_csv(output, index=False)  # set index=False to avoid saving DataFrame index
+    save_analysis(
+        similarities,
+        metadata=AnalysisMetadata(
+            date=np.datetime_as_string(np.datetime64("now"), unit="s"),
+            model=model_path,
+            dataset=DATASET_NAME,
+            split=split,
+            skip=skip,
+            take=take,
+            split_into_sentences=SPLIT_INTO_SENTENCES,
+        ),
+        output=output,
+    )
 
     print(
         f"Analysis complete. Calculated {len(similarities)} similarities. Results saved to {output}."
