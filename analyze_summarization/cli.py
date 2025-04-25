@@ -108,8 +108,6 @@ def create_parser() -> argparse.ArgumentParser:
         required=True,
     )
 
-    # TODO: add help command
-
     return parser
 
 
@@ -133,7 +131,6 @@ def main(argv: List[str] = sys.argv) -> int:
     elif args.command == REPORT_COMMAND:
         generate_report(args.input_path, args.output_path)
         return 0
-    # TODO: handle help command
     else:
         parser.print_help()
         return 1
