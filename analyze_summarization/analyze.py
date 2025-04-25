@@ -46,12 +46,11 @@ def _text_similarity(
     model: StaticModel,
     split_into_sentences: bool,
 ) -> float:
-    if split_into_sentences:
-        text1 = _split_into_sentences(text1)
-        text2 = _split_into_sentences(text2)
+    preprocessed_text1 = _split_into_sentences(text1) if split_into_sentences else text1
+    preprocessed_text2 = _split_into_sentences(text2) if split_into_sentences else text2
 
     vec1, vec2 = model.encode(
-        sentences=[text1, text2],
+        [preprocessed_text1, preprocessed_text2],
         show_progress_bar=False,
         max_length=None,  # reports can be quite long
     )
