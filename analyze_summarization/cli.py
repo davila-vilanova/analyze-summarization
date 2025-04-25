@@ -5,9 +5,9 @@ import argparse
 import sys
 from typing import List
 
-from commands.analyze import DATASET_NAME, analyze_dataset
-from commands.distill import distill_model
-from commands.report import generate_report
+from analyze import DATASET_NAME, analyze_dataset
+from distill import distill_model
+from report import generate_report
 
 # Command names
 DISTILL_COMMAND = "distill"
