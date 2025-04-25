@@ -5,6 +5,7 @@ import argparse
 import sys
 from typing import List
 
+from commands.analyze import analyze_dataset
 from commands.distill import distill_model
 
 # Command names
@@ -47,6 +48,28 @@ def create_parser() -> argparse.ArgumentParser:
         default=None,
     )
 
+    # Analyze command
+    analyze_parser = subparsers.add_parser(
+        ANALYZE_COMMAND,
+        help="Analyze the closeness of summaries to the original text in the "
+        "dataset, using the specified distilled model, and outputs a CSV file "
+        "with the distance results.",
+    )
+    analyze_parser.add_argument(
+        "--model",
+        "-m",
+        type=str,
+        help="Model to use for analysis.",
+        required=True,
+    )
+    analyze_parser.add_argument(
+        "--output-path",
+        "-o",
+        type=str,
+        help="Output path for the analysis results.",
+        required=True,
+    )
+
     # TODO: add help command after all 3 other commands are implemented
 
     return parser
@@ -59,6 +82,9 @@ def main(argv: List[str] = sys.argv) -> int:
 
     if args.command == DISTILL_COMMAND:
         distill_model(args.model, args.output_path)
+        return 0
+    elif args.command == ANALYZE_COMMAND:
+        analyze_dataset(args.model, args.output_path)
         return 0
     # TODO: handle help command
     else:
