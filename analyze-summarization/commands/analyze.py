@@ -59,7 +59,13 @@ def _text_similarity(
     return _cosine_similarity(vec1, vec2)
 
 
-def analyze_dataset(model_path: str, output: str) -> None:
+def analyze_dataset(
+    model_path: str,
+    output: str,
+    split: str,
+    skip: Optional[int] = None,
+    take: Optional[int] = None,
+) -> None:
     """Analyze the closeness of summaries to the original text in the dataset."""
     print(f"Analyzing with {model_path}...")
 
@@ -67,8 +73,10 @@ def analyze_dataset(model_path: str, output: str) -> None:
     similarities = []
 
     print(f"Loading dataset {DATASET_NAME} for streaming.")
-    dataset = load_dataset(DATASET_NAME, split=SPLIT, streaming=True)
-    subset = dataset.skip(15).take(10)
+
+    dataset = load_dataset(DATASET_NAME, split=split, streaming=True)
+    subset = dataset if skip is None else dataset.skip(skip)
+    subset = subset if take is None else subset.take(take)
     for sample in subset:
         text1 = sample[REPORT_KEY]
         text2 = sample[SUMMARY_KEY]

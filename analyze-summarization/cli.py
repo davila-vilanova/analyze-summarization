@@ -68,6 +68,25 @@ def create_parser() -> argparse.ArgumentParser:
         help="Output path for the analysis results.",
         required=True,
     )
+    analyze_parser.add_argument(
+        "--split",
+        "-s",
+        type=str,
+        help="Dataset split to analyze. Use 'train', 'validation', or 'test'. Defaults to 'validation'.",
+        default="validation",
+    )
+    analyze_parser.add_argument(
+        "--skip",
+        type=int,
+        help="Number of samples to skip in the dataset.",
+        default=None,
+    )
+    analyze_parser.add_argument(
+        "--take",
+        type=int,
+        help="Number of samples to take from the dataset.",
+        default=None,
+    )
 
     # TODO: add help command after all 3 other commands are implemented
 
@@ -83,7 +102,13 @@ def main(argv: List[str] = sys.argv) -> int:
         distill_model(args.model, args.output_path)
         return 0
     elif args.command == ANALYZE_COMMAND:
-        analyze_dataset(args.model, args.output_path)
+        analyze_dataset(
+            args.model,
+            args.output_path,
+            args.split,
+            args.skip,
+            args.take,
+        )
         return 0
     # TODO: handle help command
     else:
