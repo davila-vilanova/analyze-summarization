@@ -5,9 +5,9 @@ import argparse
 import sys
 from typing import List
 
-from commands.analyze import analyze_dataset
+from commands.analyze import DATASET_NAME, analyze_dataset
 from commands.distill import distill_model
-from commands.analyze import DATASET_NAME
+from commands.report import generate_report
 
 # Command names
 DISTILL_COMMAND = "distill"
@@ -88,7 +88,27 @@ def create_parser() -> argparse.ArgumentParser:
         default=None,
     )
 
-    # TODO: add help command after all 3 other commands are implemented
+    # Report command
+    report_parser = subparsers.add_parser(
+        REPORT_COMMAND,
+        help="Generate a report from the analysis results.",
+    )
+    report_parser.add_argument(
+        "--input-path",
+        "-i",
+        type=str,
+        help="Input path for the analysis results.",
+        required=True,
+    )
+    report_parser.add_argument(
+        "--output-path",
+        "-o",
+        type=str,
+        help="Output path for the report.",
+        required=True,
+    )
+
+    # TODO: add help command
 
     return parser
 
@@ -109,6 +129,9 @@ def main(argv: List[str] = sys.argv) -> int:
             args.skip,
             args.take,
         )
+        return 0
+    elif args.command == REPORT_COMMAND:
+        generate_report(args.input_path, args.output_path)
         return 0
     # TODO: handle help command
     else:
